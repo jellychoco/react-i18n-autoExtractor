@@ -2,20 +2,22 @@ import * as parser from '@babel/parser';
 import traverse from '@babel/traverse';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as glob from 'glob';
+import { globSync } from 'glob';
 import { createHash } from 'crypto';
 import { I18nConfig, TranslationKey } from '../types';
 
 export class TranslationParser {
-    private config: I18nConfig;
+    constructor(private config: I18nConfig) {}
 
-    constructor(config: I18nConfig) {
-        this.config = config;
+    private shouldIgnoreAttribute(name: string): boolean {
+        const ignoreList = ['className', 'style', 'id', 'data-testid'];
+        return ignoreList.includes(name);
     }
 
     async extractTranslations(): Promise<TranslationKey[]> {
-        const translations: TranslationKey[] = [];
-        const files = this.findReactFiles(this.config.sourceDir);
+        const translations = new Set<TranslationKey>();
+        const files = globSync(`${this.config.sourceDir}/**/*.{js,jsx,ts,tsx}`);
+        const shouldIgnoreAttribute = this.shouldIgnoreAttribute;
 
         for (const file of files) {
             const content = fs.readFileSync(file, 'utf-8');
@@ -25,23 +27,34 @@ export class TranslationParser {
             });
 
             traverse(ast, {
-                JSXText: (path) => {
-                    this.handleTranslationNode(path, translations, file);
-                },
-                StringLiteral: (path) => {
-                    if (this.isJSXAttribute(path)) {
-                        this.handleTranslationNode(path, translations, file);
+                JSXText(path) {
+                    const text = path.node.value.trim();
+                    if (text) {
+                        translations.add({
+                            key: text.toUpperCase().replace(/[^A-Z0-9]+/g, '_'),
+                            defaultValue: text,
+                            file,
+                            line: path.node.loc?.start.line || 0,
+                        });
                     }
                 },
-                TemplateLiteral: (path) => {
-                    if (this.isJSXAttribute(path)) {
-                        this.handleTemplateLiteral(path, translations, file);
+                JSXAttribute(path) {
+                    if (path.node.value?.type === 'StringLiteral') {
+                        const text = path.node.value.value.trim();
+                        if (text && !shouldIgnoreAttribute(path.node.name.name as string)) {
+                            translations.add({
+                                key: text.toUpperCase().replace(/[^A-Z0-9]+/g, '_'),
+                                defaultValue: text,
+                                file,
+                                line: path.node.loc?.start.line || 0,
+                            });
+                        }
                     }
                 },
             });
         }
 
-        return this.deduplicateTranslations(translations);
+        return Array.from(translations);
     }
 
     protected generateKey(text: string): string {
@@ -58,7 +71,7 @@ export class TranslationParser {
     }
 
     private findReactFiles(dir: string): string[] {
-        return glob.sync(path.join(dir, '**/*.{jsx,tsx,js,ts}'), {
+        return globSync(path.join(dir, '**/*.{jsx,tsx,js,ts}'), {
             ignore: ['**/node_modules/**', '**/dist/**', '**/*.test.*', '**/*.spec.*', ...(this.config.ignorePatterns || [])],
         });
     }
@@ -72,11 +85,6 @@ export class TranslationParser {
 
     private isJSXAttribute(path: any): boolean {
         return path.parent?.type === 'JSXAttribute' && !this.shouldIgnoreAttribute(path.parent.name.name);
-    }
-
-    private shouldIgnoreAttribute(name: string): boolean {
-        const ignoreList = ['className', 'style', 'id', 'data-testid'];
-        return ignoreList.includes(name);
     }
 
     private handleTranslationNode(path: any, translations: TranslationKey[], file: string): void {

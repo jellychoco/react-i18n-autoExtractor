@@ -1,7 +1,10 @@
 {
-    "name": "react-i18n-auto",
-    "version": "1.0.0",
-    "description": "Automatic i18n management tool for React applications",
+    "name": "@jellychoco/react-i18n-auto",
+    "version": "1.0.26",
+    "publishConfig": {
+        "access": "public"
+    },
+    "description": "Automatic internationalization tool for React applications that transforms JSX text nodes into i18n translations with TypeScript support",
     "main": "./dist/index.js",
     "bin": {
         "react-i18n-auto": "./dist/cli/index.js"
@@ -11,19 +14,58 @@
         "build": "tsc",
         "pretest": "npm run build",
         "test": "jest",
-        "start": "node dist/cli/index.js"
+        "start": "node dist/cli/index.js",
+        "prepublishOnly": "npm run build && npm test",
+        "prepare": "npm run build",
+        "prepublish:patch": "npm test",
+        "prepublish:minor": "npm test",
+        "prepublish:major": "npm test",
+        "publish:patch": "npm test && npm version patch --no-git-tag-version && npm publish",
+        "publish:minor": "npm test && npm version minor --no-git-tag-version && npm publish",
+        "publish:major": "npm test && npm version major --no-git-tag-version && npm publish"
     },
     "keywords": [
         "react",
         "i18n",
         "internationalization",
-        "automation"
+        "localization",
+        "translation",
+        "typescript",
+        "babel-plugin",
+        "automation",
+        "jsx",
+        "react-i18n",
+        "i18next",
+        "auto-translation",
+        "language",
+        "multilingual",
+        "l10n"
     ],
-    "author": "",
+    "author": "jellychoco",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jellychoco/jellychoco-react-i18n-auto"
+    },
+    "bugs": {
+        "url": "https://github.com/jellychoco/jellychoco-react-i18n-auto/issues"
+    },
+    "homepage": "https://github.com/jellychoco/jellychoco-react-i18n-auto#readme",
     "license": "MIT",
-    "devDependencies": {
+    "dependencies": {
         "@babel/core": "^7.24.0",
+        "@babel/parser": "^7.24.0",
+        "@babel/plugin-syntax-jsx": "^7.24.0",
+        "@babel/traverse": "^7.24.0",
         "@babel/types": "^7.24.0",
+        "chalk": "^4.1.2",
+        "commander": "^12.0.0",
+        "glob": "^10.3.10",
+        "inquirer": "^8.2.6",
+        "prettier": "^3.5.2",
+        "yargs": "^17.7.2"
+    },
+    "devDependencies": {
+        "@babel/preset-react": "^7.26.3",
         "@types/babel__core": "^7.20.5",
         "@types/babel__helper-plugin-utils": "^7.10.3",
         "@types/inquirer": "^9.0.7",
@@ -31,26 +73,25 @@
         "@types/node": "^20.11.24",
         "@types/prettier": "^3.0.0",
         "@types/yargs": "^17.0.32",
-        "chalk": "^4.1.2",
-        "commander": "^12.0.0",
-        "glob": "^10.3.10",
-        "inquirer": "^8.2.6",
         "jest": "^29.7.0",
-        "prettier": "^3.5.2",
         "ts-jest": "^29.1.2",
-        "typescript": "^5.3.3",
-        "yargs": "^17.7.2"
+        "typescript": "^5.3.3"
     },
     "files": [
         "dist",
         "README.md",
-        "LICENSE"
+        "LICENSE",
+        "babel.js"
     ],
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
+        },
+        "./babel": {
+            "types": "./dist/babel-plugin/index.d.ts",
+            "default": "./dist/babel-plugin/index.js"
         }
     }
 }

@@ -3,23 +3,20 @@ import { i18n } from '../i18n';
 describe('i18n Core', () => {
     beforeEach(() => {
         i18n.clearCache();
+        i18n.setTranslations({
+            en: {
+                WELCOME: 'Welcome, {name}!',
+                HELLO: 'Hello',
+            },
+            ko: {
+                WELCOME: '환영합니다, {name}님!',
+                HELLO: '안녕하세요',
+            },
+        });
         i18n.setLanguage('en');
     });
 
     describe('Basic Translation', () => {
-        beforeEach(() => {
-            i18n.setTranslations({
-                en: {
-                    HELLO: 'Hello',
-                    WELCOME: 'Welcome, {{name}}!',
-                },
-                ko: {
-                    HELLO: '안녕하세요',
-                    WELCOME: '환영합니다, {{name}}님!',
-                },
-            });
-        });
-
         it('should translate simple text', () => {
             expect(i18n.t('HELLO')).toBe('Hello');
             i18n.setLanguage('ko');

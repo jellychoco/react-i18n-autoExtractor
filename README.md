@@ -1,4 +1,4 @@
-# react-i18n-auto
+# @jellychoco/react-i18n-auto
 
 Automatic internationalization (i18n) management tool for React applications with TypeScript support.
 
@@ -11,46 +11,32 @@ Automatic internationalization (i18n) management tool for React applications wit
 - 🔍 Comprehensive CLI tools for i18n management
 - 📱 Follows Apple's Human Interface Guidelines for UI components
 
-## Quick Start
-
-### 1. Installation
+## Installation
 
 ```bash
-npm install react-i18n-auto
+npm install @jellychoco/react-i18n-auto
 ```
 
-### 2. Initialize and Configure
+### Initialize Configuration
 
 ```bash
 npx react-i18n-auto init
-```
-
-This creates `config/i18n.json`:
-
-```json
-{
-    "sourceDir": "./src",
-    "localesDir": "./src/locales",
-    "defaultLocale": "en",
-    "supportedLocales": ["en", "ko"],
-    "keyGeneration": "text",
-    "outputFormat": "flat",
-    "ignorePatterns": []
-}
 ```
 
 Add to `.babelrc` or `babel.config.js`:
 
 ```json
 {
-    "plugins": ["react-i18n-auto/babel"]
+    "plugins": ["@jellychoco/react-i18n-auto/babel"]
 }
 ```
 
-### 3. Basic Usage
+## Quick Start
+
+### 1. Basic Usage
 
 ```typescript
-import { i18n } from 'react-i18n-auto';
+import { i18n } from '@jellychoco/react-i18n-auto';
 
 // Simple text translation
 function Welcome() {
@@ -68,12 +54,12 @@ function UserGreeting({ name, count }) {
 }
 ```
 
-### 4. Language Management
+### 2. Language Management
 
 ```typescript
 // i18nContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { i18n } from 'react-i18n-auto';
+import { i18n } from '@jellychoco/react-i18n-auto';
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState(
@@ -107,15 +93,15 @@ function LanguageSwitcher() {
 
 ## CLI Commands
 
-| Command            | Description                   |
-| ------------------ | ----------------------------- |
-| `init`             | Initialize project            |
-| `extract`          | Extract translation keys      |
-| `sync`             | Synchronize translation files |
-| `check`            | Check missing translations    |
-| `check-duplicates` | Find duplicate keys           |
-| `check-unused`     | Find unused keys              |
-| `clean`            | Remove unused translations    |
+| Command            | Description                            | Options                                                                                                                                                                      |
+| ------------------ | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `init`             | Initialize project configuration       | `-y, --yes`: Skip prompts and use defaults                                                                                                                                   |
+| `extract`          | Extract translations from source files | `-n, --namespace`: Namespace for translations<br>`-f, --format`: Output format (flat/nested)<br>`-b, --backup`: Create backup of existing files                              |
+| `check-duplicates` | Find duplicate translation keys        |                                                                                                                                                                              |
+| `check-unused`     | Find unused translation keys           |                                                                                                                                                                              |
+| `clean`            | Remove unused translations             | `-d, --dry-run`: Show what would be removed without making changes                                                                                                           |
+| `status`           | Show translation status                |                                                                                                                                                                              |
+| `exclusion`        | Manage translation exclusion rules     | `-a, --add <pattern>`: Add exclusion pattern<br>`-r, --remove <pattern>`: Remove pattern<br>`-l, --list`: List all patterns<br>`--reason <reason>`: Add reason for exclusion |
 
 ## Configuration Options
 
@@ -143,4 +129,4 @@ MIT
 
 ## Support
 
-Issues and feature requests: [GitHub Issues](https://github.com/jellychoco/react-i18n-auto/issues)
+Issues and feature requests: [GitHub Issues](https://github.com/jellychoco/react-i18n-transformer/issues)

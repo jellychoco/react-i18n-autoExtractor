@@ -2,18 +2,18 @@ type EventCallback = () => void;
 type TranslationCache = Map<string, { value: string; timestamp: number }>;
 
 export class I18n {
-    private currentLanguage: string;
-    private translations: Record<string, Record<string, string>> = {};
+    private currentLanguage: string = 'en';
+    private translations: { [key: string]: { [key: string]: string } } = {};
     private eventListeners: Set<EventCallback> = new Set();
     private cache: TranslationCache = new Map();
     private cacheTimeout: number = 5 * 60 * 1000; // 5 minutes default
 
-    constructor(defaultLanguage: string = 'en') {
-        this.currentLanguage = defaultLanguage;
+    constructor() {
+        // Initialize any other necessary properties
     }
 
     // 프록시 대신 직접 메서드 호출 방식으로 변경
-    t(key: string, params?: Record<string, string>): string {
+    t(key: string, params?: Record<string, any>): string {
         const cacheKey = `${this.currentLanguage}:${key}`;
         const cached = this.cache.get(cacheKey);
 
@@ -40,9 +40,12 @@ export class I18n {
         return this.interpolate(translation, params);
     }
 
-    private interpolate(text: string, params?: Record<string, string>): string {
+    private interpolate(text: string, params?: Record<string, any>): string {
         if (!params) return text;
-        return text.replace(/\{\{(\w+)\}\}/g, (_, key) => params[key] || '');
+        return text.replace(/\{(\w+)\}/g, (_, key) => {
+            const value = params[key];
+            return value !== undefined ? value.toString() : '';
+        });
     }
 
     // 언어 변경
@@ -83,6 +86,10 @@ export class I18n {
 
     getLanguage(): string {
         return this.currentLanguage;
+    }
+
+    loadTranslations(lang: string, translations: Record<string, string>) {
+        this.translations[lang] = translations;
     }
 }
 

@@ -1,0 +1,3 @@
+{
+    "plugins": ["@jellychoco/react-i18n-auto/babel"]
+}
