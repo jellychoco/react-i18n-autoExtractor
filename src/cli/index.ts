@@ -209,7 +209,7 @@ program
 
                     if (result?.code) {
                         try {
-                            const formatted = require('prettier').format(result.code, {
+                            const formatted = await require('prettier').format(result.code, {
                                 parser: 'typescript',
                                 semi: true,
                                 singleQuote: true,

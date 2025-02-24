@@ -30,6 +30,17 @@ export default declare((api: BabelAPI) => {
                         const hasImport = path.node.body.some((node) => t.isImportDeclaration(node) && node.source.value === '@jellychoco/react-i18n-auto');
                         if (!hasImport) {
                             const importDecl = t.importDeclaration([t.importSpecifier(t.identifier('i18n'), t.identifier('i18n'))], t.stringLiteral('@jellychoco/react-i18n-auto'));
+
+                            const existingImports = path.node.body.filter((node): node is t.ImportDeclaration => t.isImportDeclaration(node));
+                            if (existingImports.length > 0) {
+                                const firstImport = existingImports[0];
+                                firstImport.leadingComments = firstImport.leadingComments || [];
+                                firstImport.leadingComments.push({
+                                    type: 'CommentLine',
+                                    value: '',
+                                });
+                            }
+
                             path.unshiftContainer('body', importDecl);
                         }
                     }

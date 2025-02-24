@@ -1,6 +1,6 @@
 {
     "name": "@jellychoco/react-i18n-auto",
-    "version": "1.0.26",
+    "version": "1.0.31",
     "publishConfig": {
         "access": "public"
     },
