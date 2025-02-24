@@ -1,6 +1,58 @@
 # @jellychoco/react-i18n-auto
 
-Automatic internationalization (i18n) management tool for React applications with TypeScript support.
+🌍 Instant i18n for React: Transform your entire application into a multi-language ready state with a single command. No more manual text extraction, no more forgotten strings, no more i18n headaches.
+
+> Turn 100+ hours of manual internationalization work into a 30-second automated process.
+
+## 0. Transform Example
+
+```jsx
+// Before
+function App() {
+    return (
+        <div className="App">
+            <header className="App-header">
+                <img src={logo} className="App-logo" alt="logo" />
+                <CustomTitle>Welcome to React</CustomTitle>
+                <p>
+                    Edit <code>src/App.js</code> and save to reload.
+                </p>
+                <InfoBox>
+                    You have 3 new messages
+                    <StyledLink href="/messages">Check your inbox</StyledLink>
+                </InfoBox>
+                <div>
+                    <CustomButton>Click me</CustomButton>
+                </div>
+            </header>
+        </div>
+    );
+}
+
+// After
+import { i18n } from '@jellychoco/react-i18n-auto';
+
+function App() {
+    return (
+        <div className="App">
+            <header className="App-header">
+                <img src={logo} className="App-logo" alt={i18n.t('LOGO')} />
+                <CustomTitle>{i18n.t('WELCOME_TO_REACT')}</CustomTitle>
+                <p>
+                    {i18n.t('EDIT')} <code>{i18n.t('SRC_APP_JS')}</code> {i18n.t('AND_SAVE_TO_RELOAD')}
+                </p>
+                <InfoBox>
+                    {i18n.t('YOU_HAVE_NEW_MESSAGES', { count: 3 })}
+                    <StyledLink href="/messages">{i18n.t('CHECK_YOUR_INBOX')}</StyledLink>
+                </InfoBox>
+                <div>
+                    <CustomButton>{i18n.t('CLICK_ME')}</CustomButton>
+                </div>
+            </header>
+        </div>
+    );
+}
+```
 
 ## Features
 
@@ -23,13 +75,33 @@ npm install @jellychoco/react-i18n-auto
 npx react-i18n-auto init
 ```
 
-Add to `.babelrc` or `babel.config.js`:
+## 🛠 Setup
+
+### Babel Configuration
+
+Create or modify your project's `babel.config.js`:
+
+```javascript
+module.exports = {
+    plugins: [
+        // Other plugins that transform JSX should come first
+        '@babel/plugin-transform-react-jsx',
+        // Our plugin should be after JSX transformations
+        '@jellychoco/react-i18n-auto/babel',
+        // Other plugins can follow
+    ],
+};
+```
+
+Or if you're using `.babelrc`:
 
 ```json
 {
-    "plugins": ["@jellychoco/react-i18n-auto/babel"]
+    "plugins": ["@babel/plugin-transform-react-jsx", "@jellychoco/react-i18n-auto/babel"]
 }
 ```
+
+> **Note**: The order of plugins matters. Place `@jellychoco/react-i18n-auto/babel` after any JSX transformation plugins but before other code transformation plugins.
 
 ## Quick Start
 
