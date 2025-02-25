@@ -1,6 +1,6 @@
 {
     "name": "react-i18n-autoextractor",
-    "version": "1.2.0",
+    "version": "1.2.3",
     "publishConfig": {
         "access": "public"
     },
@@ -88,6 +88,10 @@
         ".": {
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
+        },
+        "./cli": {
+            "types": "./dist/cli.d.ts",
+            "default": "./dist/cli.js"
         },
         "./babel": {
             "types": "./dist/babel-plugin/index.d.ts",
