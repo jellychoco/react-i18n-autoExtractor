@@ -153,6 +153,45 @@ Or if you're using `.babelrc`:
 
 > **Note**: The order of plugins matters. Place `react-i18n-autoextractor/babel` after any JSX transformation plugins but before other code transformation plugins.
 
+### Initialize i18n
+
+Add the following code to your application's entry point (e.g., `src/index.tsx` or `src/index.js`):
+
+```typescript
+import { i18n } from 'react-i18n-autoextractor';
+import { I18nProvider } from 'somewhere';
+// Initialize translations
+i18n.setTranslations({
+    en: require('./locales/en.json'),
+    ko: require('./locales/ko.json'),
+});
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+    <React.StrictMode>
+        <I18nProvider>
+            <App />
+        </I18nProvider>
+    </React.StrictMode>
+);
+```
+
+### TypeScript Configuration
+
+If you're using TypeScript, make sure your `tsconfig.json` includes:
+
+```json
+{
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        "esModuleInterop": true
+        // ... other options
+    }
+}
+```
+
+This enables importing JSON files as modules in TypeScript.
+
 ## Quick Start
 
 ### 1. Basic Usage
@@ -180,38 +219,81 @@ function UserGreeting({ name, count }) {
 
 ```typescript
 // i18nContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { i18n } from 'react-i18n-autoextractor';
 
+const I18nContext = createContext<{
+    currentLanguage: string;
+    setLanguage: (lang: string) => void;
+} | undefined>(undefined);
+
+const SUPPORTED_LANGUAGES = ['en', 'ko'] as const;
+type SupportedLanguage = typeof SUPPORTED_LANGUAGES[number];
+
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [currentLanguage, setCurrentLanguage] = useState(
-    localStorage.getItem('language') || 'en'
-  );
+    const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en');
 
-  const setLanguage = (lang: string) => {
-    localStorage.setItem('language', lang);
-    i18n.setLanguage(lang);
-    setCurrentLanguage(lang);
-  };
+    const setLanguage = (lang: string) => {
+        if (SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage)) {
+            i18n.setLanguage(lang);
+            setCurrentLanguage(lang as SupportedLanguage);
+        }
+    };
 
-  return (
-    <I18nContext.Provider value={{ currentLanguage, setLanguage }}>
-      {children}
-    </I18nContext.Provider>
-  );
+    return (
+        <I18nContext.Provider value={{ currentLanguage, setLanguage }}>
+            {children}
+        </I18nContext.Provider>
+    );
 }
 
-// Usage
+export function useI18n() {
+    const context = useContext(I18nContext);
+    if (!context) {
+        throw new Error('useI18n must be used within an I18nProvider');
+    }
+    return context;
+}
+
+// Usage Example
 function LanguageSwitcher() {
-  const { currentLanguage, setLanguage } = useI18n();
-  return (
-    <select value={currentLanguage} onChange={(e) => setLanguage(e.target.value)}>
-      <option value="en">English</option>
-      <option value="ko">한국어</option>
-    </select>
-  );
+    const { currentLanguage, setLanguage } = useI18n();
+
+    return (
+        <select
+            value={currentLanguage}
+            onChange={(e) => setLanguage(e.target.value)}
+            aria-label="Select language"
+        >
+            <option value="en">English</option>
+            <option value="ko">한국어</option>
+        </select>
+    );
 }
 ```
+
+The `I18nProvider` component should wrap your app at a high level:
+
+```typescript
+// src/index.tsx or src/App.tsx
+import { I18nProvider } from './i18nContext';
+
+function App() {
+    return (
+        <I18nProvider>
+            <App />
+        </I18nProvider>
+    );
+}
+```
+
+Key features of this implementation:
+
+- Type-safe context with TypeScript
+- Strict language type checking with literal types
+- Error boundary for incorrect usage
+- Accessibility support with ARIA labels
+- Easy to extend with more languages
 
 ## CLI Commands
 
