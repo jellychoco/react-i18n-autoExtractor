@@ -1,18 +1,30 @@
 import { declare } from '@babel/helper-plugin-utils';
-import type { NodePath } from '@babel/traverse';
-import type { PluginPass } from '@babel/core';
+import { NodePath, PluginPass } from '@babel/core';
 import * as t from '@babel/types';
+import fs from 'fs';
 
 interface BabelAPI {
     assertVersion(version: number): void;
 }
 
-interface PluginState extends PluginPass {
-    usesTranslation: boolean;
+interface PluginOptions {
+    onNewTranslation?: (key: string, text: string) => void;
 }
 
-// 번역이 필요한 속성들
-const TRANSLATABLE_ATTRIBUTES = new Set(['placeholder', 'title', 'label', 'helperText', 'description', 'alt']);
+interface PluginState extends PluginPass {
+    usesTranslation: boolean;
+    opts: PluginOptions;
+}
+
+// Only translate user-facing content attributes
+const TRANSLATABLE_ATTRIBUTES = new Set([
+    'placeholder', // Input placeholder text
+    'title', // Tooltip text
+    'label', // Form label text
+    'alt', // Image alternative text
+    'aria-label', // Accessibility label
+    'aria-description', // Accessibility description
+]);
 
 export default declare((api: BabelAPI) => {
     api.assertVersion(7);
@@ -70,5 +82,9 @@ function generateTranslationKey(text: string): string {
 function isTranslatableAttribute(path: NodePath<t.JSXAttribute>): boolean {
     const name = path.node.name.name;
     if (typeof name !== 'string') return false;
+    // Ignore HTML attributes that should not be translated
+    const nonTranslatableAttrs = ['href', 'src', 'rel', 'target', 'type', 'id', 'name', 'className', 'style'];
+    if (nonTranslatableAttrs.includes(name)) return false;
+
     return TRANSLATABLE_ATTRIBUTES.has(name);
 }

@@ -14,49 +14,73 @@ export class TranslationManager {
 
     async extractAndUpdate(): Promise<void> {
         const translations = await this.parser.extractTranslations();
+        console.log('\nExtracted translations in manager:', translations);
         await this.updateTranslationFiles(translations);
     }
 
     private async updateTranslationFiles(translations: TranslationKey[]): Promise<void> {
-        // 디렉토리가 없으면 생성
+        console.log('\nUpdating translation files with:', translations);
+
         if (!fs.existsSync(this.config.localesDir)) {
             fs.mkdirSync(this.config.localesDir, { recursive: true });
         }
 
-        // 백업 생성 (설정된 경우)
-        if (this.config.backupPath) {
-            await this.backupTranslationFiles();
-        }
-
         for (const locale of this.config.supportedLocales) {
             const filePath = path.join(this.config.localesDir, `${locale}.json`);
-            let existingTranslations: TranslationFile = {};
+            console.log(`\nProcessing locale file: ${filePath}`);
+            let translationsMap: TranslationFile = {};
 
-            // 기존 번역 파일이 있으면 로드
             if (fs.existsSync(filePath)) {
-                existingTranslations = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+                try {
+                    const content = fs.readFileSync(filePath, 'utf-8');
+                    translationsMap = content ? JSON.parse(content) : {};
+                    console.log('Existing translations:', translationsMap);
+                } catch (error) {
+                    console.warn(`Warning: Failed to parse ${filePath}`);
+                }
             }
 
-            // 새로운 번역 객체 생성
-            const updatedTranslations = this.createUpdatedTranslations(translations, existingTranslations, locale);
+            for (const trans of translations) {
+                const key = this.getTranslationKey(trans);
+                console.log(`\nProcessing key: ${key}`);
+                if (locale === this.config.defaultLocale) {
+                    translationsMap[key] = trans.defaultValue;
+                } else if (!translationsMap[key]) {
+                    translationsMap[key] = '';
+                }
+            }
 
-            // 네임스페이스 처리
-            const finalTranslations = this.config.outputFormat === 'nested' ? this.convertToNestedFormat(updatedTranslations) : updatedTranslations;
-
-            // 파일 저장
-            fs.writeFileSync(filePath, JSON.stringify(finalTranslations, null, 2));
+            console.log('\nWriting translations:', translationsMap);
+            fs.writeFileSync(filePath, JSON.stringify(translationsMap, null, 2));
         }
     }
 
     private createUpdatedTranslations(newTranslations: TranslationKey[], existingTranslations: TranslationFile, locale: string): TranslationFile {
-        const translations: TranslationFile = { ...existingTranslations };
+        const translations: TranslationFile = {};
 
         for (const trans of newTranslations) {
             const key = this.getTranslationKey(trans);
-            if (!translations[key]) {
-                translations[key] = locale === this.config.defaultLocale ? trans.defaultValue : '';
+            if (locale === this.config.defaultLocale) {
+                if (!existingTranslations[key] || existingTranslations[key] !== trans.defaultValue) {
+                    translations[key] = trans.defaultValue;
+                } else {
+                    translations[key] = existingTranslations[key];
+                }
+            } else {
+                if (!existingTranslations[key]) {
+                    translations[key] = '';
+                } else {
+                    translations[key] = existingTranslations[key];
+                }
             }
         }
+
+        // 기존 번역 중 여전히 사용되는 것들 유지
+        Object.entries(existingTranslations).forEach(([key, value]) => {
+            if (!translations[key]) {
+                translations[key] = value;
+            }
+        });
 
         return translations;
     }

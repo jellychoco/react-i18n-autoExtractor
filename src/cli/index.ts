@@ -143,106 +143,53 @@ program
     .option('-b, --backup', 'Create backup of existing translation files')
     .action(async (options) => {
         try {
-            // 기본 설정값 정의
-            const defaultConfig = {
-                sourceDir: './src',
-                localesDir: './src/locales',
-                defaultLocale: 'en',
-                supportedLocales: ['en'],
-                keyGeneration: 'text',
-            };
-
-            // config 파일이 있으면 로드, 없으면 기본값 사용
-            let config;
-            try {
-                config = JSON.parse(fs.readFileSync('./config/i18n.json', 'utf-8'));
-            } catch (e) {
-                config = defaultConfig;
-                console.log(chalk.yellow('No config file found, using default settings'));
-            }
-
-            // 1. 먼저 파일 백업 (옵션이 있는 경우)
-            if (options.backup) {
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                const backupDir = path.join('./backup', timestamp);
-                fs.mkdirSync(backupDir, { recursive: true });
-
-                // 소스 파일 백업
-                const sourceFiles = globSync('./src/**/*.{js,jsx,ts,tsx}');
-                for (const file of sourceFiles) {
-                    const relativePath = path.relative('./src', file);
-                    const backupPath = path.join(backupDir, relativePath);
-                    fs.mkdirSync(path.dirname(backupPath), { recursive: true });
-                    fs.copyFileSync(file, backupPath);
-                }
-            }
-
-            // 2. 파일 변환 및 저장
+            // 1. 먼저 파일 변환
             const sourceFiles = globSync('./src/**/*.{js,jsx,ts,tsx}');
-            let transformedCount = 0;
+            let newTranslations = new Set<string>();
 
             for (const file of sourceFiles) {
                 const code = fs.readFileSync(file, 'utf-8');
 
                 // React 컴포넌트 파일인 경우에만 변환
                 if (isReactComponentFile(file, code)) {
-                    // CLI 컨텍스트 설정
-                    process.env.BABEL_CLI_CONTEXT = 'true';
-
                     const result = require('@babel/core').transformSync(code, {
                         filename: file,
                         babelrc: false,
                         configFile: false,
-                        plugins: ['@babel/plugin-syntax-jsx', require('../babel-plugin').default],
-                        presets: [],
+                        plugins: [
+                            '@babel/plugin-syntax-jsx',
+                            [
+                                require('../babel-plugin').default,
+                                {
+                                    onNewTranslation: (key: string, value: string) => {
+                                        newTranslations.add(JSON.stringify({ key, value }));
+                                    },
+                                },
+                            ],
+                        ],
                         parserOpts: {
                             plugins: ['jsx'],
                             sourceType: 'module',
                         },
-                        retainLines: true,
-                        compact: false,
-                        comments: true,
                     });
 
-                    // CLI 컨텍스트 초기화
-                    process.env.BABEL_CLI_CONTEXT = 'false';
-
                     if (result?.code) {
-                        try {
-                            const formatted = await require('prettier').format(result.code, {
-                                parser: 'typescript',
-                                semi: true,
-                                singleQuote: true,
-                                tabWidth: 4,
-                                jsxSingleQuote: true,
-                            });
-                            fs.writeFileSync(file, formatted);
-                            transformedCount++;
-                            console.log(chalk.green(`Transformed: ${file}`));
-                        } catch (error) {
-                            console.error(chalk.red(`Error formatting ${file}:`, error));
-                            // 포맷팅에 실패하면 원본 변환 코드를 저장
-                            fs.writeFileSync(file, result.code);
-                            transformedCount++;
-                            console.log(chalk.yellow(`Transformed without formatting: ${file}`));
-                        }
+                        fs.writeFileSync(file, result.code);
+                        console.log(chalk.green(`Transformed: ${file}`));
                     }
-                } else {
-                    console.log(chalk.gray(`Skipped: ${file} (not a React component)`));
                 }
             }
 
-            // 3. 번역 키 추출 및 저장
-            const manager = new TranslationManager({
-                ...config,
-                ...(options.backup ? { backupPath: './backup' } : {}),
-            });
-            await manager.extractAndUpdate();
+            // 2. 번역 키 추출 및 저장
+            const config = JSON.parse(fs.readFileSync('./config/i18n.json', 'utf-8'));
+            // 새로 변환된 키들 추가
+            const newTranslationArray = Array.from(newTranslations).map((t) => JSON.parse(t));
+            config.newTranslations = newTranslationArray;
 
-            console.log(chalk.green(`✨ Successfully transformed ${transformedCount} React component files and extracted translations!`));
+            const manager = new TranslationManager(config);
+            await manager.extractAndUpdate();
         } catch (error) {
-            console.error(chalk.red('Error during extraction:'), error);
-            process.exit(1);
+            console.error('Error during extraction:', error);
         }
     });
 
