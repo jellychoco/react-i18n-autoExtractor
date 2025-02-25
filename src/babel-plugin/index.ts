@@ -27,20 +27,9 @@ export default declare((api: BabelAPI) => {
                 },
                 exit(path: NodePath<t.Program>, state: PluginState) {
                     if (state.usesTranslation) {
-                        const hasImport = path.node.body.some((node) => t.isImportDeclaration(node) && node.source.value === '@jellychoco/react-i18n-auto');
+                        const hasImport = path.node.body.some((node) => t.isImportDeclaration(node) && node.source.value === 'react-i18n-autoextractor');
                         if (!hasImport) {
-                            const importDecl = t.importDeclaration([t.importSpecifier(t.identifier('i18n'), t.identifier('i18n'))], t.stringLiteral('@jellychoco/react-i18n-auto'));
-
-                            const existingImports = path.node.body.filter((node): node is t.ImportDeclaration => t.isImportDeclaration(node));
-                            if (existingImports.length > 0) {
-                                const firstImport = existingImports[0];
-                                firstImport.leadingComments = firstImport.leadingComments || [];
-                                firstImport.leadingComments.push({
-                                    type: 'CommentLine',
-                                    value: '',
-                                });
-                            }
-
+                            const importDecl = t.importDeclaration([t.importSpecifier(t.identifier('i18n'), t.identifier('i18n'))], t.stringLiteral('react-i18n-autoextractor'));
                             path.unshiftContainer('body', importDecl);
                         }
                     }

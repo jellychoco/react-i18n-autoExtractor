@@ -191,9 +191,9 @@ program
 
                     const result = require('@babel/core').transformSync(code, {
                         filename: file,
-                        babelrc: false, // 프로젝트의 babel 설정 무시
-                        configFile: false, // babel.config.js 무시
-                        plugins: ['@babel/plugin-syntax-jsx', '@jellychoco/react-i18n-auto/babel'],
+                        babelrc: false,
+                        configFile: false,
+                        plugins: ['@babel/plugin-syntax-jsx', require('../babel-plugin').default],
                         presets: [],
                         parserOpts: {
                             plugins: ['jsx'],

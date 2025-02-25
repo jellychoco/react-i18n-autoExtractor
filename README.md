@@ -84,8 +84,6 @@ Create or modify your project's `babel.config.js`:
 ```javascript
 module.exports = {
     plugins: [
-        // Other plugins that transform JSX should come first
-        '@babel/plugin-transform-react-jsx',
         // Our plugin should be after JSX transformations
         'react-i18n-autoextractor/babel',
         // Other plugins can follow
@@ -97,7 +95,7 @@ Or if you're using `.babelrc`:
 
 ```json
 {
-    "plugins": ["@babel/plugin-transform-react-jsx", "react-i18n-autoextractor/babel"]
+    "plugins": ["react-i18n-autoextractor/babel"]
 }
 ```
 
@@ -165,15 +163,81 @@ function LanguageSwitcher() {
 
 ## CLI Commands
 
-| Command            | Description                            | Options                                                                                                                                                                      |
-| ------------------ | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `init`             | Initialize project configuration       | `-y, --yes`: Skip prompts and use defaults                                                                                                                                   |
-| `extract`          | Extract translations from source files | `-n, --namespace`: Namespace for translations<br>`-f, --format`: Output format (flat/nested)<br>`-b, --backup`: Create backup of existing files                              |
-| `check-duplicates` | Find duplicate translation keys        |                                                                                                                                                                              |
-| `check-unused`     | Find unused translation keys           |                                                                                                                                                                              |
-| `clean`            | Remove unused translations             | `-d, --dry-run`: Show what would be removed without making changes                                                                                                           |
-| `status`           | Show translation status                |                                                                                                                                                                              |
-| `exclusion`        | Manage translation exclusion rules     | `-a, --add <pattern>`: Add exclusion pattern<br>`-r, --remove <pattern>`: Remove pattern<br>`-l, --list`: List all patterns<br>`--reason <reason>`: Add reason for exclusion |
+### 1. Initialize Project
+
+```bash
+# Initialize project configuration
+npx i18n-extract init
+
+# This will create:
+#   - config/i18n.json
+#   - src/locales/en.json
+#   - src/locales/ko.json
+
+# Default config (config/i18n.json):
+{
+    "sourceDir": "./src",
+    "localesDir": "./src/locales",
+    "defaultLocale": "en",
+    "supportedLocales": ["en", "ko"],
+    "keyGeneration": "text",
+    "outputFormat": "flat",
+    "ignorePatterns": []
+}
+```
+
+### 2. Extract Translations
+
+```bash
+# Extract all translations from your React components
+npx i18n-extract extract
+
+# Generated translation files (src/locales/en.json):
+{
+    "WELCOME_TO_REACT": "Welcome to React",
+    "EDIT": "Edit",
+    "SRC_APP_JS": "src/App.js",
+    "AND_SAVE_TO_RELOAD": "and save to reload",
+    "YOU_HAVE_NEW_MESSAGES": "You have {count} new messages",
+    "CHECK_YOUR_INBOX": "Check your inbox",
+    "CLICK_ME": "Click me"
+}
+
+# Korean translations will be created with empty strings (src/locales/ko.json):
+{
+    "WELCOME_TO_REACT": "",
+    "EDIT": "",
+    "SRC_APP_JS": "",
+    "AND_SAVE_TO_RELOAD": "",
+    "YOU_HAVE_NEW_MESSAGES": "",
+    "CHECK_YOUR_INBOX": "",
+    "CLICK_ME": ""
+}
+```
+
+### 3. Additional Commands
+
+```bash
+# Check for duplicate translation keys
+npx i18n-extract check-duplicates
+
+# Find unused translation keys
+npx i18n-extract check-unused
+
+# Show translation status
+npx i18n-extract status
+
+# Clean up unused translations
+npx i18n-extract clean
+```
+
+### How It Works
+
+1. The extract command scans your React components for text content
+2. Automatically transforms JSX text nodes into i18n.t() calls
+3. Generates translation keys based on the text content
+4. Creates or updates translation files for all supported languages
+5. Preserves existing translations when updating files
 
 ## Configuration Options
 
