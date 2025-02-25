@@ -1,4 +1,4 @@
-# react-i18n-autoExtractor
+# react-i18n-autoextractor
 
 🌍 Instant i18n for React: Transform your entire application into a multi-language ready state with a single command. No more manual text extraction, no more forgotten strings, no more i18n headaches.
 
@@ -30,7 +30,7 @@ function App() {
 }
 
 // After
-import { i18n } from 'react-i18n-autoExtractor';
+import { i18n } from 'react-i18n-autoextractor';
 
 function App() {
     return (
@@ -66,7 +66,7 @@ function App() {
 ## Installation
 
 ```bash
-npm install --save-dev react-i18n-autoExtractor
+npm install --save-dev react-i18n-autoextractor
 ```
 
 ### Initialize Configuration
@@ -87,7 +87,7 @@ module.exports = {
         // Other plugins that transform JSX should come first
         '@babel/plugin-transform-react-jsx',
         // Our plugin should be after JSX transformations
-        'react-i18n-autoExtractor/babel',
+        'react-i18n-autoextractor/babel',
         // Other plugins can follow
     ],
 };
@@ -97,18 +97,18 @@ Or if you're using `.babelrc`:
 
 ```json
 {
-    "plugins": ["@babel/plugin-transform-react-jsx", "react-i18n-autoExtractor/babel"]
+    "plugins": ["@babel/plugin-transform-react-jsx", "react-i18n-autoextractor/babel"]
 }
 ```
 
-> **Note**: The order of plugins matters. Place `react-i18n-autoExtractor/babel` after any JSX transformation plugins but before other code transformation plugins.
+> **Note**: The order of plugins matters. Place `react-i18n-autoextractor/babel` after any JSX transformation plugins but before other code transformation plugins.
 
 ## Quick Start
 
 ### 1. Basic Usage
 
 ```typescript
-import { i18n } from 'react-i18n-autoExtractor';
+import { i18n } from 'react-i18n-autoextractor';
 
 // Simple text translation
 function Welcome() {
@@ -131,7 +131,7 @@ function UserGreeting({ name, count }) {
 ```typescript
 // i18nContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { i18n } from 'react-i18n-autoExtractor';
+import { i18n } from 'react-i18n-autoextractor';
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState(

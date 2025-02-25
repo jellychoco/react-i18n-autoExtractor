@@ -7,12 +7,12 @@ module.exports = function (api) {
     if (isCliContext) {
         // CLI 실행 시 JSX 변환 없이 텍스트만 변환
         return {
-            plugins: ['@babel/plugin-syntax-jsx', [require('./dist/babel-plugin'), {}]],
+            plugins: ['@babel/plugin-syntax-jsx', [require('react-i18n-autoextractor/babel'), {}]],
         };
     }
 
     // 일반 빌드 시 기존 설정 사용
     return {
-        plugins: [require('./dist/babel-plugin')],
+        plugins: [require('react-i18n-autoextractor/babel')],
     };
 };
