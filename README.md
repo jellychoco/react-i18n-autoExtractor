@@ -4,6 +4,8 @@
 
 > Turn 100+ hours of manual internationalization work into a 30-second automated process.
 
+![react-i18n-autoextractor demo](docs/demo.gif)
+
 ## Preview
 
 ```jsx
