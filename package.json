@@ -1,13 +1,13 @@
 {
-    "name": "@jellychoco/react-i18n-auto",
+    "name": "react-i18n-autoExtractor",
     "version": "1.1.0",
     "publishConfig": {
         "access": "public"
     },
-    "description": "Automatic internationalization tool for React applications that transforms JSX text nodes into i18n translations with TypeScript support",
+    "description": "Automatic i18n text extraction tool for React applications - transforms JSX text nodes into i18n translations with TypeScript support",
     "main": "./dist/index.js",
     "bin": {
-        "react-i18n-auto": "./dist/cli/index.js"
+        "i18n-extract": "./dist/cli/index.js"
     },
     "scripts": {
         "prebuild": "rm -rf dist",
@@ -44,12 +44,12 @@
     "author": "jellychoco",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jellychoco/jellychoco-react-i18n-auto"
+        "url": "https://github.com/jellychoco/react-i18n-autoExtractor"
     },
     "bugs": {
-        "url": "https://github.com/jellychoco/jellychoco-react-i18n-auto/issues"
+        "url": "https://github.com/jellychoco/react-i18n-autoExtractor/issues"
     },
-    "homepage": "https://github.com/jellychoco/jellychoco-react-i18n-auto#readme",
+    "homepage": "https://github.com/jellychoco/react-i18n-autoExtractor#readme",
     "license": "MIT",
     "dependencies": {
         "@babel/core": "^7.24.0",
