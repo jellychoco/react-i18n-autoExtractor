@@ -4,7 +4,7 @@
 
 > Turn 100+ hours of manual internationalization work into a 30-second automated process.
 
-## 0. Transform Example
+## Preview
 
 ```jsx
 // Before
@@ -29,7 +29,10 @@ function App() {
     );
 }
 
-// After
+// Extract translations
+npx i18n-extract extract
+
+// After few seconds, you can see the generated translation files
 import { i18n } from 'react-i18n-autoextractor';
 
 function App() {
@@ -52,6 +55,29 @@ function App() {
         </div>
     );
 }
+# Generated translation files (src/locales/en.json):
+{
+    "LOGO": "logo",
+    "WELCOME_TO_REACT": "Welcome to React",
+    "EDIT": "Edit",
+    "SRC_APP_JS": "src/App.js",
+    "AND_SAVE_TO_RELOAD": "and save to reload",
+    "YOU_HAVE_NEW_MESSAGES": "You have 3 new messages",
+    "CHECK_YOUR_INBOX": "Check your inbox",
+    "CLICK_ME": "Click me"
+}
+
+# Korean translations will be created with empty strings (src/locales/ko.json):
+{
+    "LOGO": "",
+    "WELCOME_TO_REACT": "",
+    "EDIT": "",
+    "SRC_APP_JS": "",
+    "AND_SAVE_TO_RELOAD": "",
+    "YOU_HAVE_NEW_MESSAGES": "",
+    "CHECK_YOUR_INBOX": "",
+    "CLICK_ME": ""
+}
 ```
 
 ## Features
@@ -73,6 +99,30 @@ npm install --save-dev react-i18n-autoextractor
 
 ```bash
 npx i18n-extract init
+
+# This will start an interactive setup:
+? Choose your default language (en)
+? What other languages do you want to support? (ko,ja)
+? Where are your source files located? (./src)
+? Where do you want to store translation files? (./src/locales)
+
+
+
+# After answering the questions, it will create:
+#   - config/i18n.json
+#   - src/locales/en.json
+#   - src/locales/ko.json
+
+# Generated config (config/i18n.json):
+{
+    "sourceDir": "./src",
+    "localesDir": "./src/locales",
+    "defaultLocale": "en",
+    "supportedLocales": ["en", "ko"],
+    "keyGeneration": "text",
+    "outputFormat": "flat",
+    "ignorePatterns": []
+}
 ```
 
 ## 🛠 Setup
@@ -185,84 +235,3 @@ npx i18n-extract init
     "ignorePatterns": []
 }
 ```
-
-### 2. Extract Translations
-
-```bash
-# Extract all translations from your React components
-npx i18n-extract extract
-
-# Generated translation files (src/locales/en.json):
-{
-    "WELCOME_TO_REACT": "Welcome to React",
-    "EDIT": "Edit",
-    "SRC_APP_JS": "src/App.js",
-    "AND_SAVE_TO_RELOAD": "and save to reload",
-    "YOU_HAVE_NEW_MESSAGES": "You have {count} new messages",
-    "CHECK_YOUR_INBOX": "Check your inbox",
-    "CLICK_ME": "Click me"
-}
-
-# Korean translations will be created with empty strings (src/locales/ko.json):
-{
-    "WELCOME_TO_REACT": "",
-    "EDIT": "",
-    "SRC_APP_JS": "",
-    "AND_SAVE_TO_RELOAD": "",
-    "YOU_HAVE_NEW_MESSAGES": "",
-    "CHECK_YOUR_INBOX": "",
-    "CLICK_ME": ""
-}
-```
-
-### 3. Additional Commands
-
-```bash
-# Check for duplicate translation keys
-npx i18n-extract check-duplicates
-
-# Find unused translation keys
-npx i18n-extract check-unused
-
-# Show translation status
-npx i18n-extract status
-
-# Clean up unused translations
-npx i18n-extract clean
-```
-
-### How It Works
-
-1. The extract command scans your React components for text content
-2. Automatically transforms JSX text nodes into i18n.t() calls
-3. Generates translation keys based on the text content
-4. Creates or updates translation files for all supported languages
-5. Preserves existing translations when updating files
-
-## Configuration Options
-
-| Option           | Description                 | Default         |
-| ---------------- | --------------------------- | --------------- |
-| sourceDir        | Source code directory       | "./src"         |
-| localesDir       | Translation files directory | "./src/locales" |
-| defaultLocale    | Default language            | "en"            |
-| supportedLocales | Supported languages         | ["en"]          |
-| keyGeneration    | Key generation method       | "text"          |
-| outputFormat     | Output format style         | "flat"          |
-| ignorePatterns   | Patterns to ignore          | []              |
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-MIT
-
-## Support
-
-Issues and feature requests: [GitHub Issues](https://github.com/jellychoco/react-i18n-transformer/issues)
