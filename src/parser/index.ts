@@ -34,7 +34,6 @@ export class TranslationParser {
 
         for (const file of files) {
             const content = fs.readFileSync(file, 'utf-8');
-            console.log(`\nFile content for ${file}:`, content);
 
             const ast = parser.parse(content, {
                 sourceType: 'module',
@@ -44,12 +43,10 @@ export class TranslationParser {
             traverse(ast, {
                 JSXText: (path) => {
                     const text = path.node.value.trim();
-                    console.log('\nFound JSX text:', text);
                     const parent = path.parentPath;
                     const isI18nCall = parent && t.isJSXExpressionContainer(parent.node) && t.isCallExpression(parent.node.expression) && t.isMemberExpression(parent.node.expression.callee) && t.isIdentifier(parent.node.expression.callee.object, { name: 'i18n' }) && t.isIdentifier(parent.node.expression.callee.property, { name: 't' });
 
                     if (text && !this.shouldIgnore(text) && !isI18nCall) {
-                        console.log('Adding translation for:', text);
                         translations.add({
                             key: this.generateKey(text),
                             defaultValue: text,
@@ -61,9 +58,7 @@ export class TranslationParser {
                 JSXAttribute: (path) => {
                     if (path.node.value?.type === 'StringLiteral') {
                         const text = path.node.value.value.trim();
-                        console.log('\nFound JSX attribute:', text);
                         if (text && !this.shouldIgnoreAttribute(path.node.name.name as string)) {
-                            console.log('Adding translation for attribute:', text);
                             translations.add({
                                 key: this.generateKey(text),
                                 defaultValue: text,
@@ -89,7 +84,6 @@ export class TranslationParser {
             });
         }
 
-        console.log('\nFinal translations:', Array.from(translations));
         return Array.from(translations);
     }
 
@@ -113,24 +107,18 @@ export class TranslationParser {
     }
 
     private shouldIgnore(text: string): boolean {
-        console.log('Checking text:', text);
         if (!text.trim()) {
-            console.log('Empty text');
             return true;
         }
         if (/^\d+$/.test(text)) {
-            console.log('Number text');
             return true;
         }
         if (/^https?:\/\//.test(text)) {
-            console.log('URL text');
             return true;
         }
         if (/^(_blank|noopener|noreferrer)$/.test(text)) {
-            console.log('HTML attribute text');
             return true;
         }
-        console.log('Valid text found');
         return false;
     }
 
