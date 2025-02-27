@@ -4,6 +4,8 @@
 
 > Turn 100+ hours of manual internationalization work into a 30-second automated process.
 
+> **IMPORTANT**: Version 1.2.4 or higher is required. Versions below 1.2.4 will not work correctly and may cause unexpected behavior in your application.
+
 ![react-i18n-autoextractor demo](docs/demo.gif)
 
 ## Preview
@@ -294,28 +296,3 @@ Key features of this implementation:
 - Error boundary for incorrect usage
 - Accessibility support with ARIA labels
 - Easy to extend with more languages
-
-## CLI Commands
-
-### 1. Initialize Project
-
-```bash
-# Initialize project configuration
-npx i18n-extract init
-
-# This will create:
-#   - config/i18n.json
-#   - src/locales/en.json
-#   - src/locales/ko.json
-
-# Default config (config/i18n.json):
-{
-    "sourceDir": "./src",
-    "localesDir": "./src/locales",
-    "defaultLocale": "en",
-    "supportedLocales": ["en", "ko"],
-    "keyGeneration": "text",
-    "outputFormat": "flat",
-    "ignorePatterns": []
-}
-```
